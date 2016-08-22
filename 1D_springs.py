@@ -15,8 +15,9 @@ force = np.array(node.ix[:,3])
 k = spring.ix[:, 3]
 
 # 剛性マトリクス
+# 現状だと一次元かつ、バネが順番に並んでいないと剛性マトリクスを正しく生成できない
 stmx = np.zeros((len(node.ix[:, 0]),len(node.ix[:, 0])))
-size = node.ix[:,0].size
+size = node.ix[:, 0].size
 i = 0
 
 for i in list(range(size)):
@@ -32,25 +33,32 @@ for i in list(range(size)):
         stmx[i, i-1] = k[i-1] * (-1)
         stmx[i, i] = k[i-1] + k[i]
         stmx[i, i+1] = k[i] * (-1)
-
-# 支持条件を読み込んで、固定→計算から削除
-# Kaaの抽出しかしてない→固定の支持条件しか計算できない
+        
+# 支持条件を読み込んで、Point_IDとEq_IDを結びつける
 i = 0
-fix = 1
+free = []
+fix = []
 for i in list(range(node.ix[:,2].size)):
-    if node.ix[i,2] == 'fix':
-        stmx = np.delete(stmx, i, 0)
-        stmx = np.delete(stmx, i, 1)
-        force = np.delete(force, i, 0)
-        print('u', i + 1, '= 0.0')
-        fix = fix + 1
+    if node.ix[i,2] == 'free':
+        free.append(node.ix[i,0])
     else:
         pass
-    i = i + 1
 
-# 連立方程式を解く
-x = np.linalg.solve(stmx, force)
+for i in list(range(node.ix[:,2].size)):
+    if node.ix[i,2] == 'fix':
+        fix.append(node.ix[i,0])
+    else:
+        pass
 
-i = 0
-for i in list(range(force.size)):
-    print('u', i + fix,'=', x[i])
+pid = free + fix    
+eqid = list(range(1, len(pid) +1))
+dic = dict(zip(pid, eqid))
+
+eqlist = []
+for i in list(range(1, len(pid) +1)):
+    eqlist.append(dic[i])
+
+
+node['Eq_ID'] = eqlist
+node_s = node.sort_values(by='Eq_ID')
+print(node_s)
