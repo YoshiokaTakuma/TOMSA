@@ -4,38 +4,59 @@ import pandas as pd
 # データの読み込み
 node = pd.read_csv('node.csv')
 spring = pd.read_csv('spring.csv')
-print(spring, '\n')
+
+# SpringのデータをPoint1順にソート
+# Point1_ID < Point2_ID に統一
+P1 = []
+P2 = []
+for i in list(range(spring.ix[:, 0].size)):
+    if spring.ix[i, 'Point1'] > spring.ix[i, 'Point2']:
+        P1.append(spring.ix[i, 'Point2'])
+        P2.append(spring.ix[i, 'Point1'])
+    else:
+        P1.append(spring.ix[i, 'Point1'])
+        P2.append(spring.ix[i, 'Point2'])
+
+spring2 = spring.drop(['Point1', 'Point2'], axis=1)
+
+spring2['Point1'] = P1
+spring2['Point2'] = P2
+spring2 = spring2[['Spring_No','Point1', 'Point2', 'constant']]
+
+spring2 = spring2.sort_values(by = ['Point1', 'Point2'])
+# ソートしたデータフレームのindex番号を付け直す
+spring2 = spring2.reset_index(drop=True)
+print(spring2, '\n')
+
 
 # 各ばねのばね定数
-k = spring.ix[:, 'constant']
+k = spring2.ix[:, 'constant']
 
-
-# 剛性マトリクス
-# 現状だと一次元かつ、バネが順番に並んでいないと剛性マトリクスを正しく生成できない
+# 剛体マトリクスの生成
+# 節点数の大きさの０行列
 stmx = np.zeros((len(node.ix[:, 0]),len(node.ix[:, 0])))
-size = node.ix[:, 0].size
 
-for i in list(range(size)):
-    if i == 0:
-        stmx[0, 0] = k[0]
-        stmx[0, 1] = k[0] * (-1)
-    elif i == size - 1:
-        stmx[i, i-1] = k[i-1] * (-1)
-        stmx[i, i] = k[i-1]
-    else:
-        stmx[i, i-1] = k[i-1] * (-1)
-        stmx[i, i] = k[i-1] + k[i]
-        stmx[i, i+1] = k[i] * (-1)
+# 部材剛性マトリクスを生成→全体マトリクスに足していく
+# 部材剛性マトリクスをnずつずらして行くので、一直線のみに使える
+for n in list(range(len(spring2.ix[:, 0]))):
+    ele = np.zeros((len(node.ix[:, 0]),len(node.ix[:, 0])))
+    for i in list(range(2)):
+        for j in list(range(2)):
+            if i == j:
+                ele[i + n, j + n] = k[n]
+            else:
+                ele[i +n , j + n] = -k[n]
+    stmx = stmx + ele
 
 # 支持条件を読み込んで、Point_IDとEq_IDを結びつける
 free = []
-fix = []
 for i in list(range(node.ix[:, 'support'].size)):
     if node.ix[i,2] == 'free':
         free.append(node.ix[i,0])
     else:
         pass
 
+fix = []
 for i in list(range(node.ix[:, 'support'].size)):
     if node.ix[i,2] == 'fix':
         fix.append(node.ix[i,0])
@@ -50,7 +71,7 @@ dic = dict(zip(pid, eqid))
 eqlist = []
 for i in list(range(1, len(pid) +1)):
     eqlist.append(dic[i])
-    
+
 node['Eq_ID'] = eqlist
 node_s = node.sort_values(by='Eq_ID')
 # ソートしたデータフレームのindex番号を付け直す
