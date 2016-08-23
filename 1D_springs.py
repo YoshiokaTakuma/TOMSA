@@ -4,6 +4,7 @@ import pandas as pd
 # データの読み込み
 node = pd.read_csv('node.csv')
 spring = pd.read_csv('spring.csv')
+size = node.ix[:, 0].size
 
 # SpringのデータをPoint1順にソート
 # Point1_ID < Point2_ID に統一
@@ -26,7 +27,6 @@ spring2 = spring2[['Spring_No','Point1', 'Point2', 'constant']]
 spring2 = spring2.sort_values(by = ['Point1', 'Point2'])
 # ソートしたデータフレームのindex番号を付け直す
 spring2 = spring2.reset_index(drop=True)
-print(spring2, '\n')
 
 
 # 各ばねのばね定数
@@ -34,12 +34,12 @@ k = spring2.ix[:, 'constant']
 
 # 剛体マトリクスの生成
 # 節点数の大きさの０行列
-stmx = np.zeros((len(node.ix[:, 0]),len(node.ix[:, 0])))
+stmx = np.zeros((size, size))
 
 # 部材剛性マトリクスを生成→全体マトリクスに足していく
 # 部材剛性マトリクスをnずつずらして行くので、一直線のみに使える
 for n in list(range(len(spring2.ix[:, 0]))):
-    ele = np.zeros((len(node.ix[:, 0]),len(node.ix[:, 0])))
+    ele = np.zeros((size, size))
     for i in list(range(2)):
         for j in list(range(2)):
             if i == j:
@@ -50,14 +50,14 @@ for n in list(range(len(spring2.ix[:, 0]))):
 
 # 支持条件を読み込んで、Point_IDとEq_IDを結びつける
 free = []
-for i in list(range(node.ix[:, 'support'].size)):
+for i in list(range(size)):
     if node.ix[i,2] == 'free':
         free.append(node.ix[i,0])
     else:
         pass
 
 fix = []
-for i in list(range(node.ix[:, 'support'].size)):
+for i in list(range(size)):
     if node.ix[i,2] == 'fix':
         fix.append(node.ix[i,0])
     else:
@@ -76,19 +76,23 @@ node['Eq_ID'] = eqlist
 node_s = node.sort_values(by='Eq_ID')
 # ソートしたデータフレームのindex番号を付け直す
 node_s = node_s.reset_index(drop=True)
+
+print('節点の情報')
 print(node_s, '\n')
+print('ばねの情報')
+print(spring2, '\n')
 
 
 # マトリックスの列を、ソートしたPoint_ID順に新しい行列に入れていく
-arr = np.empty((3,0), int)
-for i in list(range(node_s.ix[:, 0].size)):
-    arr = np.hstack((arr, stmx[:, node_s.ix[i, 'Point_ID']-1].reshape(3, 1)))   
+arr = np.empty((size, 0), int)
+for i in list(range(size)):
+    arr = np.hstack((arr, stmx[:, node_s.ix[i, 'Point_ID']-1].reshape(node_s.ix[:, 0].size, 1)))   
 
 # 上で作った行列の行をさらに、PointID順にまた新しい行列にいれていく
-arr2 = np.empty((0,3), int)
-for i in list(range(node_s.ix[:, 0].size)):
+arr2 = np.empty((0, size), int)
+for i in list(range(size)):
     arr2 = np.vstack((arr2, arr[node_s.ix[i, 'Point_ID']-1, :]))
-    
+
 print('変形後の全体剛性マトリクス')
 print(arr2, '\n') 
 
