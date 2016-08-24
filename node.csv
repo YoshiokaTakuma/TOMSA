@@ -2,3 +2,5 @@ Point_ID,CorrdiX,support,force
 1,0,fix,0
 2,1,free,0
 3,2,free,10
+4,3,fix,0
+5,5,free,20
