@@ -32,13 +32,13 @@ print(spring, '\n')
 
 # 支持条件を読み込んで、方程式IDと節点の順番を結びつけて辞書に登録
 free = []
-for i in list(range(martix_size)):
+for i in list(range(matrix_size)):
     if node.ix[i,3] == 'free':
         free.append(str(node.ix[i,0]) + 'x')
         free.append(str(node.ix[i,0]) + 'y')
 
 fix = []
-for i in list(range(martix_size)):
+for i in list(range(matrix_size)):
     if node.ix[i,3] == 'fix':
         free.append(str(node.ix[i,0]) + 'x')
         free.append(str(node.ix[i,0]) + 'y')
@@ -81,5 +81,3 @@ for spring_id in list(range(spring_number)):
             element_matrix = inv_trans.dot(local).dot(trans)
             print(element_matrix, '\n')
 
-
-            
