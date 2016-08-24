@@ -4,110 +4,75 @@ import pandas as pd
 # データの読み込み
 node = pd.read_csv('node.csv')
 spring = pd.read_csv('spring.csv')
-size = node.ix[:, 0].size
 
-# SpringのデータをPoint1順にソート
-# Point1_ID < Point2_ID に統一
-P1 = []
-P2 = []
-for i in list(range(spring.ix[:, 0].size)):
-    if spring.ix[i, 'Point1'] > spring.ix[i, 'Point2']:
-        P1.append(spring.ix[i, 'Point2'])
-        P2.append(spring.ix[i, 'Point1'])
-    else:
-        P1.append(spring.ix[i, 'Point1'])
-        P2.append(spring.ix[i, 'Point2'])
+print('節点の情報')
+print(node, '\n')
+print('ばねの情報')
+print(spring, '\n')
 
-spring2 = spring.drop(['Point1', 'Point2'], axis=1)
+# よく使う定数と配列の定義
+martix_size = node.ix[:, 0].size
+spring_number = spring.ix[:, 0].size
+k = spring.ix[:, 'constant']
 
-spring2['Point1'] = P1
-spring2['Point2'] = P2
-spring2 = spring2[['Spring_No','Point1', 'Point2', 'constant']]
+# 支持条件を読み込んで、方程式IDと節点の順番を結びつけて辞書に登録
+free = []
+for i in list(range(martix_size)):
+    if node.ix[i,2] == 'free':
+        free.append(node.ix[i,0])
 
-spring2 = spring2.sort_values(by = ['Point1', 'Point2'])
-# ソートしたデータフレームのindex番号を付け直す
-spring2 = spring2.reset_index(drop=True)
+fix = []
+for i in list(range(martix_size)):
+    if node.ix[i,2] == 'fix':
+        fix.append(node.ix[i,0])
 
+point_order = free + fix    
+eq_id = list(range(1, len(point_order) +1))
+dic = dict(zip(point_order, eq_id))
 
-# 各ばねのばね定数
-k = spring2.ix[:, 'constant']
 
 # 剛体マトリクスの生成
 # 節点数の大きさの０行列
-stmx = np.zeros((size, size))
+matrix = np.zeros((martix_size, martix_size))
 
-# 部材剛性マトリクスを生成→全体マトリクスに足していく
-# 部材剛性マトリクスをnずつずらして行くので、一直線のみに使える
-for n in list(range(len(spring2.ix[:, 0]))):
-    ele = np.zeros((size, size))
-    for i in list(range(2)):
-        for j in list(range(2)):
-            if i == j:
-                ele[i + n, j + n] = k[n]
-            else:
-                ele[i +n , j + n] = -k[n]
-    stmx = stmx + ele
-
-# 支持条件を読み込んで、Point_IDとEq_IDを結びつける
-free = []
-for i in list(range(size)):
-    if node.ix[i,2] == 'free':
-        free.append(node.ix[i,0])
-    else:
-        pass
-
-fix = []
-for i in list(range(size)):
-    if node.ix[i,2] == 'fix':
-        fix.append(node.ix[i,0])
-    else:
-        pass
-
-pid = free + fix    
-eqid = list(range(1, len(pid) +1))
-dic = dict(zip(pid, eqid))
-
-# nodeにEq_IDを追加して、Eq_ID順にソート
-eqlist = []
-for i in list(range(1, len(pid) +1)):
-    eqlist.append(dic[i])
-
-node['Eq_ID'] = eqlist
-node_s = node.sort_values(by='Eq_ID')
-# ソートしたデータフレームのindex番号を付け直す
-node_s = node_s.reset_index(drop=True)
-
-print('節点の情報')
-print(node_s, '\n')
-print('ばねの情報')
-print(spring2, '\n')
-
-
-# マトリックスの列を、ソートしたPoint_ID順に新しい行列に入れていく
-arr = np.empty((size, 0), int)
-for i in list(range(size)):
-    arr = np.hstack((arr, stmx[:, node_s.ix[i, 'Point_ID']-1].reshape(node_s.ix[:, 0].size, 1)))   
-
-# 上で作った行列の行をさらに、PointID順にまた新しい行列にいれていく
-arr2 = np.empty((0, size), int)
-for i in list(range(size)):
-    arr2 = np.vstack((arr2, arr[node_s.ix[i, 'Point_ID']-1, :]))
+# バネ定数を方程式IDの該当箇所に加算
+for spring_id in list(range(spring_number)):
+    for point_id in list(range(martix_size)):
+        element_matrix = np.zeros((martix_size, martix_size))
+        if spring.ix[spring_id, 'Point1'] == point_id+1:
+            for i in list(range(1, 3)):
+                for j in list(range(1, 3)):
+                    if i == j:
+                        element_matrix[dic[spring.ix[spring_id, i]]-1, dic[spring.ix[spring_id, j]]-1] = k[spring_id]
+                    else:
+                        element_matrix[dic[spring.ix[spring_id, i]]-1, dic[spring.ix[spring_id, j]]-1] = -k[spring_id]
+        matrix = matrix + element_matrix
 
 print('変形後の全体剛性マトリクス')
-print(arr2, '\n') 
+print(matrix, '\n') 
 
 # マトリクスのうち、必要な部分を抽出
-arr3 = arr2[0:len(free), 0:len(free)]
+part_matrix = matrix[0:len(free), 0:len(free)]
 print('抽出後のマトリクス')
-print(arr3, '\n')
+print(part_matrix, '\n')
 
-# マトリクスに合わせて、力ベクトルを取得
-force = np.array(node_s.ix[0:len(free)-1,'force'])
+# 支持条件='free'の力ベクトルを抽出
+force = []
+for i in list(range(martix_size)):
+    if node.ix[i, 'support'] == 'free':
+        force.append(node.ix[i, 'force'])
+force = np.array(force)
+
 
 # 連立方程式を解く
-x = np.linalg.solve(arr3, force)
+x = np.linalg.solve(part_matrix, force)
 
-for i in list(range(len(free),len(free) + len(fix))):
-    print('u', node_s.ix[i,'Point_ID'], '= 0.0')
-for i in list(range(force.size)):
-    print('u', node_s.ix[i,'Point_ID'], '=', x[i])
+# 結果出力
+print('結果（変位）')
+count_fix = 0
+for i in list(range(martix_size)):
+    if node.ix[i, 'support'] == 'fix':
+        count_fix = count_fix + 1
+        print('u', node.ix[i,'Point_ID'], '= 0.0')        
+    elif node.ix[i, 'support'] == 'free':
+        print('u', node.ix[i,'Point_ID'], '=', x[i - count_fix])
