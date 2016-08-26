@@ -1,4 +1,5 @@
 Point_ID,CorrdiX,CorrdiY,support,forceX,forceY
 1,0,0,fix,0,0
-2,1,0,free,10,0
-3,0,1,free,0,10
+2,1,0,fix,0,0
+3,0,1,free,0,0
+4,1,1,free,1,1

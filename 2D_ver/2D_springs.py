@@ -22,7 +22,12 @@ for i in list(range(spring_number)):
     y2 = node.ix[spring.ix[i,2]-1, 2]
     
     slope = (y2 - y1)/(x2 - x1)
-    spring_deg.append(np.rad2deg(np.arctan(slope)))
+    degree = np.rad2deg(np.arctan(slope))
+    '''
+    if degree < 0:
+        degree = degree + 90
+    '''
+    spring_deg.append(degree)
 spring['degree'] = spring_deg
 
 print('ばねの情報')
@@ -62,6 +67,8 @@ for spring_id in list(range(spring_number)):
                       [-1 * sin, cos, 0, 0],
                       [0, 0, cos, sin],
                       [0, 0, -1 * sin, cos]])
+    print(spring.ix[spring_id, 'degree'])
+    
 
     for point_id in list(range(matrix_size)):
         # 基本部材マトリクスの作成
@@ -75,7 +82,8 @@ for spring_id in list(range(spring_number)):
                         local[i, j] = -k[spring_id]
             # 座標変換部材マトリクスへ変換
             trans_local = np.linalg.inv(trans).dot(local).dot(trans)
-            print(trans_local, '\n')
+            print('変換前', '\n', local, '\n')
+            print('変換後', '\n', trans_local, '\n')
             
             # 全体マトリクスの対応座標に加算していく
             # 座標変換部材マトリクスを全体マトリクスの大きさに拡張
@@ -126,32 +134,20 @@ for i in list(range(matrix_size)):
         force.append(node.ix[i, 'forceY'])
 force = np.array(force)
 
-# 逆行列がゼロになってしまうので、行と列どちらもすべて０の場合に削除
-# この方法で正しいのか？？
-count_del_eqid = []
-for i in reversed(list(range(len(free)))):
-    if np.all(part_matrix[:, i] == 0) and np.all(part_matrix[i, :] == 0):
-        part_matrix = np.delete(part_matrix, i, 0)
-        part_matrix = np.delete(part_matrix, i, 1)
-        force = np.delete(force, i, 0)
-        count_del_eqid.append(i)
-count_del_eqid.reverse()
+# 逆行列がゼロ→構造的に不安定
+if np.linalg.det(part_matrix) == 0:
+    print('構造物が不安定')
 
 # 連立方程式を解く
-x = np.linalg.solve(part_matrix, force)
+else:
+    x = np.linalg.solve(part_matrix, force)
+    # 結果出力
+    print('結果（変位）')
+    
+    for i in fix:
+        print('u' + str(i) + ' = 0.0')
 
-
-# 結果出力
-print('結果（変位）')
-
-for i in fix:
-    print('u' + str(i) + ' = 0.0')
-
-i = 0
-for j in free:
-    if dic[j]-1 in count_del_eqid:
-        print('u' + str(j) + ' = 0.0')
-    else:
-        print('u' + str(j) + ' = ' + str(x[i]))
-        i = i + 1
-        
+    j = 0
+    for i in free:
+        print('u' + str(i) + ' = ' + str(x[j]))
+        j = j + 1
