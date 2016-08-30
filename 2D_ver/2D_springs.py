@@ -6,6 +6,7 @@ import seaborn as sns
 # データの読み込み
 node = pd.read_csv('node.csv')
 spring = pd.read_csv('spring.csv')
+
 print('節点の情報')
 print(node, '\n')
 
@@ -26,6 +27,12 @@ for i in spring_number - 1:
     slope = (y2 - y1)/(x2 - x1)
     degree = np.rad2deg(np.arctan(slope))
     
+    # 角度がマイナスでも、問題なさそう？
+    '''
+    if degree<0:
+        degree = degree + 180
+    '''
+
     spring_deg.append(degree)
 spring['degree'] = spring_deg
 
@@ -34,14 +41,12 @@ print(spring, '\n')
 
 # 支持条件を読み込んで、方程式IDと節点の順番を結びつけて辞書に登録
 free = []
+fix = []
 for i in node_number - 1:
     if node.ix[i,3] == 'free':
         free.append(str(node.ix[i,0]) + 'x')
         free.append(str(node.ix[i,0]) + 'y')
-
-fix = []
-for i in node_number - 1:
-    if node.ix[i,3] == 'fix':
+    elif node.ix[i,3] == 'fix':
         fix.append(str(node.ix[i,0]) + 'x')
         fix.append(str(node.ix[i,0]) + 'y')
 
@@ -191,7 +196,6 @@ node_resluts = pd.DataFrame(
 node_resluts = node_resluts.sort_values('Point_ID')
 node_resluts['support'] = node.ix[:, 'support']
 
-# 計算結果をプロットで表示
 # ばねにかかる力を計算して、プロットする
 sns.set_style('whitegrid')
 for i in spring_number - 1:
@@ -239,8 +243,8 @@ for i in node_number - 1:
     # 変形前、変形後のプロット
     # 固定されている場合は☓をプロットする
     if node_resluts.ix[i, 'support'] == 'free':
-        Before = plt.scatter(xpoint[i],ypoint[i], s = 75, marker = 'o')
-        After = plt.scatter(xnewpoint[i],ynewpoint[i], c = 'red', s = 100, marker = 's')
+        Before = plt.scatter(xpoint[i],ypoint[i], c = 'white', s = 75, marker = 'o')
+        After = plt.scatter(xnewpoint[i],ynewpoint[i], c = 'white', s = 75, marker = 's')
     elif node_resluts.ix[i, 'support'] == 'fix':
         Fix = plt.scatter(xpoint[i],ypoint[i], s = 100, marker = 'x', c = 'k', lw = 3)
 
