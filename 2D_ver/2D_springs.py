@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
 # データの読み込み
 node = pd.read_csv('node.csv')
 spring = pd.read_csv('spring.csv')
@@ -54,8 +55,9 @@ point_order = free + fix
 eq_id = list(range(1, len(point_order) +1))
 dic = dict(zip(point_order, eq_id))
 
-
+'''
 print('座標変換部材マトリクス')
+'''
 # ここから剛体マトリクスの生成
 # 節点数の大きさの０行列
 matrix = np.zeros((matrix_size * 2, matrix_size * 2))
@@ -69,8 +71,9 @@ for spring_id in spring_number - 1:
                       [-1 * sin, cos, 0, 0],
                       [0, 0, cos, sin],
                       [0, 0, -1 * sin, cos]])
+    '''
     print('Spring_No.' + str(spring.ix[spring_id, 'Spring_No']), '： Degree =', str(spring.ix[spring_id, 'degree']) + '°')
-    
+    '''
 
     for point_id in node_number - 1:
         # 基本部材マトリクスの作成
@@ -84,9 +87,10 @@ for spring_id in spring_number - 1:
                         local[i, j] = -k[spring_id]
             # 座標変換部材マトリクスへ変換
             trans_local = np.linalg.inv(trans).dot(local).dot(trans)
+            '''
             print('変換前', '\n', local, '\n')
             print('変換後', '\n', trans_local, '\n')
-            
+            '''
             # 全体マトリクスの対応座標に加算していく
             # 座標変換部材マトリクスを全体マトリクスの大きさに拡張
             element_matrix = np.zeros((matrix_size * 2, matrix_size * 2))
@@ -128,6 +132,13 @@ part_matrix = matrix[0:len(free), 0:len(free)]
 print('抽出したマトリクス')
 print(part_matrix, '\n')
 
+'''
+# 他のマトリクス
+Kab =  matrix[0:len(free), len(free):matrix_size * 2]
+Kba =  matrix[len(free):matrix_size * 2, 0:len(free)]
+Kbb =  matrix[len(free):matrix_size * 2, len(free):matrix_size * 2]
+print(Kab, '\n\n', Kba, '\n\n', Kbb, '\n')
+'''
 # 支持条件='free'の力ベクトルを抽出
 force = []
 for i in node_number - 1:
@@ -196,6 +207,10 @@ node_resluts = pd.DataFrame(
 node_resluts = node_resluts.sort_values('Point_ID')
 node_resluts['support'] = node.ix[:, 'support']
 
+# 支持反力
+reaction_force = matrix[len(free):matrix_size * 2, 0:len(free)].dot(np.linalg.inv(part_matrix)).dot(force)
+
+
 # ばねにかかる力を計算して、プロットする
 sns.set_style('whitegrid')
 for i in spring_number - 1:
@@ -215,9 +230,10 @@ for i in spring_number - 1:
     spring_force = spring.ix[i, 'constant'] * dif_length
     
     # プロットに表示
-    text_plot_x = (node.ix[spring.ix[i, 'Point2']-1, 'CorrdiX'] + node.ix[spring.ix[i, 'Point1']-1, 'CorrdiX'])/2
-    text_plot_y = (node.ix[spring.ix[i, 'Point2']-1, 'CorrdiY'] + node.ix[spring.ix[i, 'Point1']-1, 'CorrdiY'])/2
-    plt.text(text_plot_x, text_plot_y,'F = ' + str(np.around(spring_force, decimals=3)))
+    if spring_force != 0:
+        text_plot_x = (node.ix[spring.ix[i, 'Point2']-1, 'CorrdiX'] + node.ix[spring.ix[i, 'Point1']-1, 'CorrdiX'])/2
+        text_plot_y = (node.ix[spring.ix[i, 'Point2']-1, 'CorrdiY'] + node.ix[spring.ix[i, 'Point1']-1, 'CorrdiY'])/2
+        plt.text(text_plot_x, text_plot_y, np.around(spring_force, decimals=3))
     
     # ばねの線表示
     # 伸びてたら赤線、縮んでたら青線、変化なしは黒線
@@ -230,26 +246,51 @@ for i in spring_number - 1:
     y2 = node_resluts.ix[spring.ix[i, 'Point2']-1, 'New CorrdiY']
     
     if spring_force == 0:
-        plt.plot([x1, x2], [y1, y2], 'k',  lw = 2)
+        unchanged, = plt.plot([x1, x2], [y1, y2], 'k',  lw = 2)
     elif spring_force > 0:
-        plt.plot([x1, x2], [y1, y2], 'r',  lw = 2)
+        extended, = plt.plot([x1, x2], [y1, y2], 'r',  lw = 2)
     elif spring_force < 0:
-        plt.plot([x1, x2], [y1, y2], 'b',  lw = 2)
+        shrunk, = plt.plot([x1, x2], [y1, y2], 'b',  lw = 2)
         
 for i in node_number - 1:
     # 力のベクトル
-    Force = plt.quiver(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'], 
-                       node.ix[i, 'forceX'], node.ix[i, 'forceY'],angles='xy',scale_units='xy',scale=1)
+    if node.ix[i, 'forceX'] != 0 or node.ix[i, 'forceY'] != 0:
+        ExternalForce = plt.quiver(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'], 
+                                   node.ix[i, 'forceX'], node.ix[i, 'forceY'],angles='xy',scale_units='xy',scale=1)
+        plt.text(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'] * 1.02, 
+                 '(' + str(node.ix[i, 'forceX']) + ',' + str(node.ix[i, 'forceY']) + ')')
+        
     # 変形前、変形後のプロット
     # 固定されている場合は☓をプロットする
     if node_resluts.ix[i, 'support'] == 'free':
         Before = plt.scatter(xpoint[i],ypoint[i], c = 'white', s = 75, marker = 'o')
         After = plt.scatter(xnewpoint[i],ynewpoint[i], c = 'white', s = 75, marker = 's')
+        
     elif node_resluts.ix[i, 'support'] == 'fix':
         Fix = plt.scatter(xpoint[i],ypoint[i], s = 100, marker = 'x', c = 'k', lw = 3)
+        ReactionForce = plt.quiver(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'], 
+                                    reaction_force[2 * i], reaction_force[2 * i + 1],angles='xy' ,scale_units='xy', color = 'gray', scale=1)
+        
+        if node.ix[i, 'CorrdiY'] == 0:
+            plt.text(node.ix[i, 'CorrdiX'] + 0.25, node.ix[i, 'CorrdiY'] - 0.75, 
+                     '(' + str(reaction_force[2 * i]) + ',' + str(reaction_force[2 * i + 1]) + ')')
+        else:
+            plt.text(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'] * 1.02, 
+                     '(' + str(reaction_force[2 * i]) + ',' + str(reaction_force[2 * i + 1]) + ')')
+
+            
+# 支持反力ベクトルの表示
+
+    
 
 plt.xlabel('x')
 plt.ylabel('y')
-plt.legend([Fix, Before, After, Force], ['Fix', 'Before', 'After', 'Force'], loc = 0, frameon = True, prop={'size' : 14})
+plt.legend([Fix, Before, After, ExternalForce, ReactionForce, unchanged, extended, shrunk], 
+           ['Fix', 'Before', 'After', 'External Force', 'Reaction Force', 'unchanged', 'extended', 'shrunk'], 
+           bbox_to_anchor=(1.4, 0.7), frameon = True)
+# 右側の余白を調整
+plt.subplots_adjust(right=0.7)
+plt.savefig('result.svg')
 
-plt.show()
+import webbrowser
+webbrowser.open('result.svg')
