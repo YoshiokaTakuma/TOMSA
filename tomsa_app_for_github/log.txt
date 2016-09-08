@@ -1,0 +1,101 @@
+2016-09-02T05:11:29.046933+00:00 app[web.1]:     worker.init_process()
+2016-09-02T05:11:29.046933+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/workers/base.py", line 122, in init_process
+2016-09-02T05:11:29.046934+00:00 app[web.1]:     self.load_wsgi()
+2016-09-02T05:11:29.046935+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/workers/base.py", line 130, in load_wsgi
+2016-09-02T05:11:29.046935+00:00 app[web.1]:     self.wsgi = self.app.wsgi()
+2016-09-02T05:11:29.046936+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2016-09-02T05:11:29.046937+00:00 app[web.1]:     self.callable = self.load()
+2016-09-02T05:11:29.046938+00:00 app[web.1]:     return self.load_wsgiapp()
+2016-09-02T05:11:29.046937+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+2016-09-02T05:11:29.046938+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+2016-09-02T05:11:29.046939+00:00 app[web.1]:     return util.import_app(self.app_uri)
+2016-09-02T05:11:29.046939+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/util.py", line 357, in import_app
+2016-09-02T05:11:29.046940+00:00 app[web.1]:     __import__(module)
+2016-09-02T05:11:29.046940+00:00 app[web.1]: ImportError: No module named 'app'
+2016-09-02T05:11:29.046940+00:00 app[web.1]: Traceback (most recent call last):
+2016-09-02T05:11:29.046941+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/arbiter.py", line 515, in spawn_worker
+2016-09-02T05:11:29.046941+00:00 app[web.1]:     worker.init_process()
+2016-09-02T05:11:29.046941+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/workers/base.py", line 122, in init_process
+2016-09-02T05:11:29.046942+00:00 app[web.1]:     self.load_wsgi()
+2016-09-02T05:11:29.046942+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/workers/base.py", line 130, in load_wsgi
+2016-09-02T05:11:29.046943+00:00 app[web.1]:     self.wsgi = self.app.wsgi()
+2016-09-02T05:11:29.046943+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2016-09-02T05:11:29.046943+00:00 app[web.1]:     self.callable = self.load()
+2016-09-02T05:11:29.046944+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+2016-09-02T05:11:29.046944+00:00 app[web.1]:     return self.load_wsgiapp()
+2016-09-02T05:11:29.046944+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+2016-09-02T05:11:29.046945+00:00 app[web.1]:     return util.import_app(self.app_uri)
+2016-09-02T05:11:29.046945+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/util.py", line 357, in import_app
+2016-09-02T05:11:29.046945+00:00 app[web.1]:     __import__(module)
+2016-09-02T05:11:29.046948+00:00 app[web.1]: ImportError: No module named 'app'
+2016-09-02T05:11:29.047118+00:00 app[web.1]: [2016-09-02 05:11:29 +0000] [7] [INFO] Worker exiting (pid: 7)
+2016-09-02T05:11:29.067192+00:00 app[web.1]: [2016-09-02 05:11:29 +0000] [8] [INFO] Booting worker with pid: 8
+2016-09-02T05:11:29.070852+00:00 app[web.1]: [2016-09-02 05:11:29 +0000] [8] [ERROR] Exception in worker process:
+2016-09-02T05:11:29.070854+00:00 app[web.1]: Traceback (most recent call last):
+2016-09-02T05:11:29.070855+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/arbiter.py", line 515, in spawn_worker
+2016-09-02T05:11:29.070856+00:00 app[web.1]:     worker.init_process()
+2016-09-02T05:11:29.070857+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/workers/base.py", line 122, in init_process
+2016-09-02T05:11:29.070857+00:00 app[web.1]:     self.load_wsgi()
+2016-09-02T05:11:29.070858+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/workers/base.py", line 130, in load_wsgi
+2016-09-02T05:11:29.070858+00:00 app[web.1]:     self.wsgi = self.app.wsgi()
+2016-09-02T05:11:29.070860+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2016-09-02T05:11:29.070860+00:00 app[web.1]:     self.callable = self.load()
+2016-09-02T05:11:29.070861+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+2016-09-02T05:11:29.070862+00:00 app[web.1]:     return self.load_wsgiapp()
+2016-09-02T05:11:29.070862+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+2016-09-02T05:11:29.070863+00:00 app[web.1]:     return util.import_app(self.app_uri)
+2016-09-02T05:11:29.070863+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/util.py", line 357, in import_app
+2016-09-02T05:11:29.070864+00:00 app[web.1]:     __import__(module)
+2016-09-02T05:11:29.070865+00:00 app[web.1]: ImportError: No module named 'app'
+2016-09-02T05:11:29.070865+00:00 app[web.1]: Traceback (most recent call last):
+2016-09-02T05:11:29.070866+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/arbiter.py", line 515, in spawn_worker
+2016-09-02T05:11:29.070866+00:00 app[web.1]:     worker.init_process()
+2016-09-02T05:11:29.070867+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/workers/base.py", line 122, in init_process
+2016-09-02T05:11:29.070868+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/workers/base.py", line 130, in load_wsgi
+2016-09-02T05:11:29.070868+00:00 app[web.1]:     self.load_wsgi()
+2016-09-02T05:11:29.070869+00:00 app[web.1]:     self.wsgi = self.app.wsgi()
+2016-09-02T05:11:29.070870+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2016-09-02T05:11:29.070870+00:00 app[web.1]:     self.callable = self.load()
+2016-09-02T05:11:29.070871+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+2016-09-02T05:11:29.070871+00:00 app[web.1]:     return self.load_wsgiapp()
+2016-09-02T05:11:29.070872+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+2016-09-02T05:11:29.070873+00:00 app[web.1]:     return util.import_app(self.app_uri)
+2016-09-02T05:11:29.070873+00:00 app[web.1]:   File "/app/.heroku/python/lib/python3.5/site-packages/gunicorn/util.py", line 357, in import_app
+2016-09-02T05:11:29.070874+00:00 app[web.1]:     __import__(module)
+2016-09-02T05:11:29.070878+00:00 app[web.1]: ImportError: No module named 'app'
+2016-09-02T05:11:29.070967+00:00 app[web.1]: [2016-09-02 05:11:29 +0000] [8] [INFO] Worker exiting (pid: 8)
+2016-09-02T05:11:29.206819+00:00 app[web.1]: [2016-09-02 05:11:29 +0000] [3] [INFO] Shutting down: Master
+2016-09-02T05:11:29.207041+00:00 app[web.1]: [2016-09-02 05:11:29 +0000] [3] [INFO] Reason: Worker failed to boot.
+2016-09-02T05:11:29.358346+00:00 heroku[web.1]: Process exited with status 3
+2016-09-02T05:11:29.374904+00:00 heroku[web.1]: State changed from starting to crashed
+2016-09-02T05:11:39.098306+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=tomsaapp.herokuapp.com request_id=01fb13cb-55eb-449b-9494-e26ecacc48d8 fwd="61.122.32.1" dyno= connect= service= status=503 bytes=
+2016-09-02T05:11:39.844430+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=tomsaapp.herokuapp.com request_id=8e007bcc-ecd4-4670-b75d-dd7a54ff78e1 fwd="61.122.32.1" dyno= connect= service= status=503 bytes=
+2016-09-02T05:12:25.644787+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=tomsaapp.herokuapp.com request_id=7e4481ed-101c-4703-acad-f104f83a6081 fwd="61.122.32.1" dyno= connect= service= status=503 bytes=
+2016-09-02T05:12:26.814436+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=tomsaapp.herokuapp.com request_id=f1936fea-e8b8-4e39-a2d5-8db70cf33c1a fwd="61.122.32.1" dyno= connect= service= status=503 bytes=
+2016-09-02T05:13:29.142112+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=tomsaapp.herokuapp.com request_id=8769516e-2aa0-4454-888d-097be4ea0173 fwd="61.122.32.1" dyno= connect= service= status=503 bytes=
+2016-09-02T05:13:29.598701+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=tomsaapp.herokuapp.com request_id=406a9140-5f58-46bf-a0e2-17ae279f324f fwd="61.122.32.1" dyno= connect= service= status=503 bytes=
+2016-09-02T05:13:30.501890+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=tomsaapp.herokuapp.com request_id=c1fda526-2fe5-4d16-8957-9bb3bbc44c8e fwd="61.122.32.1" dyno= connect= service= status=503 bytes=
+2016-09-02T05:13:30.950753+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=tomsaapp.herokuapp.com request_id=312b5d61-1dea-4b46-90ce-4d07909f1dc2 fwd="61.122.32.1" dyno= connect= service= status=503 bytes=
+2016-09-02T05:17:05.854250+00:00 heroku[api]: Deploy 6eb1301 by takuma-yoshioka@kke.co.jp
+2016-09-02T05:17:05.854250+00:00 heroku[api]: Release v4 created by takuma-yoshioka@kke.co.jp
+2016-09-02T05:17:06.118989+00:00 heroku[slug-compiler]: Slug compilation started
+2016-09-02T05:17:06.118998+00:00 heroku[slug-compiler]: Slug compilation finished
+2016-09-02T05:17:06.430011+00:00 heroku[web.1]: State changed from crashed to starting
+2016-09-02T05:17:18.620664+00:00 heroku[web.1]: Starting process with command `gunicorn app:app --log-file=-`
+2016-09-02T05:17:20.852505+00:00 app[web.1]: [2016-09-02 05:17:20 +0000] [3] [INFO] Listening at: http://0.0.0.0:7304 (3)
+2016-09-02T05:17:20.852590+00:00 app[web.1]: [2016-09-02 05:17:20 +0000] [3] [INFO] Using worker: sync
+2016-09-02T05:17:20.852041+00:00 app[web.1]: [2016-09-02 05:17:20 +0000] [3] [INFO] Starting gunicorn 19.4.5
+2016-09-02T05:17:20.856348+00:00 app[web.1]: [2016-09-02 05:17:20 +0000] [7] [INFO] Booting worker with pid: 7
+2016-09-02T05:17:20.858568+00:00 app[web.1]: [2016-09-02 05:17:20 +0000] [8] [INFO] Booting worker with pid: 8
+2016-09-02T05:17:22.340567+00:00 heroku[web.1]: State changed from starting to up
+2016-09-02T05:17:24.036168+00:00 app[web.1]: /app/.heroku/python/lib/python3.5/site-packages/matplotlib/font_manager.py:273: UserWarning: Matplotlib is building the font cache using fc-list. This may take a moment.
+2016-09-02T05:17:24.036175+00:00 app[web.1]:   warnings.warn('Matplotlib is building the font cache using fc-list. This may take a moment.')
+2016-09-02T05:17:24.042884+00:00 app[web.1]: /app/.heroku/python/lib/python3.5/site-packages/matplotlib/font_manager.py:273: UserWarning: Matplotlib is building the font cache using fc-list. This may take a moment.
+2016-09-02T05:17:24.042887+00:00 app[web.1]:   warnings.warn('Matplotlib is building the font cache using fc-list. This may take a moment.')
+2016-09-02T05:17:24.626511+00:00 app[web.1]: /app/.heroku/python/lib/python3.5/site-packages/matplotlib/font_manager.py:273: UserWarning: Matplotlib is building the font cache using fc-list. This may take a moment.
+2016-09-02T05:17:24.626521+00:00 app[web.1]:   warnings.warn('Matplotlib is building the font cache using fc-list. This may take a moment.')
+2016-09-02T05:17:24.627172+00:00 app[web.1]: /app/.heroku/python/lib/python3.5/site-packages/matplotlib/font_manager.py:273: UserWarning: Matplotlib is building the font cache using fc-list. This may take a moment.
+2016-09-02T05:17:24.627173+00:00 app[web.1]:   warnings.warn('Matplotlib is building the font cache using fc-list. This may take a moment.')
+2016-09-02T05:19:10.231817+00:00 heroku[router]: at=info method=GET path="/" host=tomsaapp.herokuapp.com request_id=814ac449-46c3-4fc5-a934-5ef94caaeac6 fwd="61.122.32.1" dyno=web.1 connect=2ms service=513ms status=200 bytes=54983
+2016-09-02T05:19:11.039953+00:00 heroku[router]: at=info method=GET path="/favicon.ico" host=tomsaapp.herokuapp.com request_id=15d67adc-4845-4749-82cb-cf5fa71441fd fwd="61.122.32.1" dyno=web.1 connect=1ms service=18ms status=404 bytes=386
+2016-09-02T05:20:44.578267+00:00 heroku[router]: at=info method=GET path="/" host=tomsaapp.herokuapp.com request_id=d85ea495-004a-4606-aa31-c46ed4704d0a fwd="61.122.32.1" dyno=web.1 connect=0ms service=635ms status=200 bytes=54983
