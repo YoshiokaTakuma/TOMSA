@@ -73,27 +73,24 @@ var table_spring = new Handsontable(grid_spring, {
 
 
 
-function getdata_node(){
-  var node = JSON.stringify(table_node.getData());
-  var spring = JSON.stringify(table_spring.getData());
-  var data = JSON.stringify(node + spring)
-  $.ajax({
-  type : 'post',
-  url : 'http://127.0.0.1:5000/post',
-  data : data,
-  contentType: 'application/JSON',
-  dataType: 'JSON',
-  scriptCharset: 'utf-8'
-  }).done(function(res){
-  // GET した後の処理
-  console.table('dekita')
-});;
 
-}
+        function getdata_node(){
+         var node = JSON.stringify(table_node.getData());
+         var spring = JSON.stringify(table_spring.getData());
+         var data = JSON.stringify(node + spring)
+        $.ajax({
+         type : 'post',
+         url : '/post',
+         data : data,
+        contentType: 'application/JSON',
+        //dataType: 'JSON',
+        scriptCharset: 'utf-8',
+        success: function(x){
+            $('#show_result').html(x);
+        }
+    })
+         
+
+          };
 
 
-function x(){
-  var div = document.getElementById('xxx');
-  var newElem = document.createElement('li');
-  div.appendChild(newElem);
-}

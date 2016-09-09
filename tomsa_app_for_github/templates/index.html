@@ -4,31 +4,21 @@
         <meta charset="UTF-8" />
         <title>TOMSA</title>
         <link rel="stylesheet" href="/static/css/handsontable.full.min.css" />
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     </head>
     <body>
         <h2>節点入力データ</h2>
-    <div id="grid_node">
-    </div>
 
-
-
-
+    <div id="grid_node" />
     <br/>
     <h2>ばね入力データ</h2>
-    <div id="grid_spring">
-    </div>
+    <div id="grid_spring" />
     <script src="/static/js/handsontable.full.min.js"></script>
     <script src="/static/js/tables.js"></script>
-
-    
     <br/>
-    <input id="button" type="button" value="Import_Data" onclick="getdata_node();" />
- 
-	<div id="xxx" />
 
-	<button type="button" name="aaa" value="aaa" onClick="x()">
-	</button>
 
+    <div id="show_result" />
+    <input id="button" type="button" value="Calculation" onclick="getdata_node();" />
     </body>
 </html>

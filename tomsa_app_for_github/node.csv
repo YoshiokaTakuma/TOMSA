@@ -1,5 +1,0 @@
-Point_ID,CorrdiX,CorrdiY,support,forceX,forceY
-1,0,0,fix,0,0
-2,10,0,fix,0,0
-3,0,10,free,1,0
-4,10,10,free,0,0
