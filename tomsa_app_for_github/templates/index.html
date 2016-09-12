@@ -1,27 +1,39 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8" />
-        <title>TOMSA</title>
-        <link rel="stylesheet" href="/static/css/handsontable.full.min.css" />
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    </head>
-    <body>
-        <h2>節点入力データ</h2>
+<head>
+    <meta charset="UTF-8" />
+    <title>TOMSA</title>
+    <link rel="stylesheet" href="/static/css/handsontable.full.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+</head>
+<body>
+<div id="body">
+    <div id = "top">
+    <h2>TOMSA website</h2>
+    ２次元マトリックス構造解析プログラム
+    </div>
 
-    <div id="grid_node" />
-    <br/>
-    <h2>ばね入力データ</h2>
-    <div id="grid_spring" />
+    <div id = "left">
+        <h3>節点入力データ - Node input data</h3>
+        <div id="grid_node"></div>
+    </div>
+
+    <div id = "right">
+        <h3>ばね入力データ - Spring input data</h3>
+        <div id="grid_spring"></div>
+    </div>
     <script src="/static/js/handsontable.full.min.js"></script>
     <script src="/static/js/tables.js"></script>
-    <br/>
 
-
-
-    <input id="button" type="button" value="Calculation" onclick="calculation();" />
-    <input type="button" value="Reset" onclick="location.reload();" />
-    <div id="show_result" />
-
-    </body>
+    <div id = "result">
+        <br/>
+        <p>
+            <input id="button" type="button" value="Calculation" onclick="calculation();" />
+            <input type="button" value="Reset" onclick="location.reload();" />
+        </p>
+        <div id="show_result"></div>
+    </div>
+</div>
+</body>
 </html>

@@ -1,0 +1,26 @@
+#body {
+	width : 700px ;
+	font-family : Arial, Helvetica, sans-serif;
+	margin : 10px;
+}
+
+#top {
+	text-align:center;
+}
+
+#left {
+	float: left;
+	width : 400px ;
+}
+
+#right {
+	float: right;
+	width : 300px ;
+}
+
+
+#result {
+	width : 700px ;
+	padding : 10px;
+	clear : both ;
+}

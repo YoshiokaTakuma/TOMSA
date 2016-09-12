@@ -14,23 +14,23 @@ var table_node = new Handsontable(grid_node, {
       }
     }
   },
+  allowEmpty: false,
 
   data: [
-  [1, 0, 0, 'fix', 0, 0],
-  [2, 10, 0, 'fix', 0, 0],
-  [3, 0, 10, 'free', 1, 0],
-  [4, 10, 10, 'free', 0, 0]
+  [0, 0, 'fix', 0, 0],
+  [10, 0, 'fix', 0, 0],
+  [0, 10, 'free', 1, 0],
+  [10, 10, 'free', 0, 0]
   ],
   columns: [
-    {title: 'Point_ID', type: 'numeric'},
     {title: 'CorrdiX', type: 'numeric'},
     {title: 'CorrdiY', type: 'numeric'},
     {title: 'support',
       editor: 'select',
       selectOptions: ['free', 'fix']
     },
-    {title: 'forceX', type: 'numeric'},
-    {title: 'forceY', type: 'numeric'}
+    {title: 'forceX', type: 'numeric', format: '0.0'},
+    {title: 'forceY', type: 'numeric', format: '0.0'}
     ],
   rowHeaders: true,
   enterBeginsEditing: false
@@ -53,20 +53,22 @@ var table_spring = new Handsontable(grid_spring, {
     }
   },
 
-
+  allowEmpty: false,
   data: [
-  [1, 1, 2, 1],
-  [2, 1, 3, 1],
-  [3, 2, 4, 1],
-  [4, 3, 4, 1],
-  [5, 2, 3, 0.7071]
+  [1, 2, 1],
+  [1, 3, 1],
+  [2, 4, 1],
+  [3, 4, 1],
+  [2, 3, 0.7071]
   ],
   columns: [
-    {title: 'Spring_No', type: 'numeric'},
     {title: 'Point1', type: 'numeric'},
     {title: 'Point2', type: 'numeric'},
-    {title: 'constant', type: 'numeric'}
-    ],
+    {title: 'constant',
+      type: 'numeric',
+      format: '0.0',
+      validator: /^[0-9]+(\.[0-9]{1,4})?$/
+    }],
   rowHeaders: true,
   enterBeginsEditing: false
 });
