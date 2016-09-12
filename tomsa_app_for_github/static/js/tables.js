@@ -71,26 +71,21 @@ var table_spring = new Handsontable(grid_spring, {
   enterBeginsEditing: false
 });
 
-
-
-
-        function getdata_node(){
-         var node = JSON.stringify(table_node.getData());
-         var spring = JSON.stringify(table_spring.getData());
-         var data = JSON.stringify(node + spring)
-        $.ajax({
-         type : 'post',
-         url : '/post',
-         data : data,
-        contentType: 'application/JSON',
-        //dataType: 'JSON',
-        scriptCharset: 'utf-8',
-        success: function(x){
-            $('#show_result').html(x);
-        }
+function calculation(){
+  var node = JSON.stringify(table_node.getData());
+  var spring = JSON.stringify(table_spring.getData());
+  var data = JSON.stringify(node + spring);
+  $.ajax({
+    type : 'post',
+    url : '/post',
+    data : data,
+    contentType: 'application/JSON',
+    scriptCharset: 'utf-8',
+    success: function(x){
+      $('show_result').append($('#show_result').html(x));
+      // $('#show_result').html(x);
+    }
     })
-         
-
-          };
+};
 
 
