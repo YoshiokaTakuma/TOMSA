@@ -27,6 +27,7 @@ def post():
 
     # postからデータ読み込み
     all_data = request.json
+    print(all_data)
     index = all_data.find('][')
     node = pd.DataFrame(eval(all_data[0:index + 1]))
     node.columns = ['Point_ID', 'CorrdiX', 'CorrdiY', 'support', 'forceX', 'forceY']
@@ -149,49 +150,27 @@ def post():
     if np.linalg.det(part_matrix) == 0:
         svgstr = 'マトリクスの逆行列＝０、構造物が不安定'
 
-        '''print('マトリクスの逆行列＝０、構造物が不安定')'''
-
     # 連立方程式を解く
     else:
         u = np.linalg.solve(part_matrix, force)
 
-        # 座標表示
-        # グラフ出力のため、新しいリストを定義
+        # 結果dataframeのため、新しいリストを定義
+        # PointID順だから、念の為PointIDをカウント→あとからソート
         xnewpoint = []
         ynewpoint = []
-        xpoint = []
-        ypoint = []
         pointlist = []
-
-        for i in fix:
-            if 'x' in i:
-                i = int(i.replace('x', ''))
-                x = node.ix[i-1, 'CorrdiX']
-                xpoint.append(node.ix[i-1, 'CorrdiX'])
-                xnewpoint.append(x)
-            
-            elif 'y' in i:
-                i = int(i.replace('y', ''))
-                y = node.ix[i-1, 'CorrdiY']
-                ypoint.append(node.ix[i-1, 'CorrdiY'])
-                ynewpoint.append(y)
-                pointlist.append(i)
-
+        
         j = 0
-        for i in free:
-            if 'x' in i:
-                i = int(i.replace('x', ''))
-                x = node.ix[i-1, 'CorrdiX'] + u[j]
-                xpoint.append(node.ix[i-1, 'CorrdiX'])
-                xnewpoint.append(x)
-                j = j + 1
-            elif 'y' in i:
-                i = int(i.replace('y', ''))
-                y = node.ix[i-1, 'CorrdiY'] + u[j]
-                ypoint.append(node.ix[i-1, 'CorrdiY'])
-                ynewpoint.append(y)
-                j = j + 1
-                pointlist.append(i)
+        for i in node_number - 1:
+            pointlist.append(i + 1)
+            if node.ix[i,3] == 'fix':
+                xnewpoint.append(node.ix[i, 'CorrdiX'])
+                ynewpoint.append(node.ix[i, 'CorrdiY'])
+            elif node.ix[i,3] == 'free':
+                xnewpoint.append(node.ix[i, 'CorrdiX'] + u[j])
+                j = j +1
+                ynewpoint.append(node.ix[i, 'CorrdiY'] + u[j])
+                j = j +1
 
         # 結果のデータフレーム
         node_resluts = pd.DataFrame(
@@ -262,12 +241,12 @@ def post():
             # 変形前、変形後のプロット
             # 固定されている場合は☓をプロットする
             if node_resluts.ix[i, 'support'] == 'free':
-                Before = plt.scatter(xpoint[i],ypoint[i], c = 'white', s = 75, marker = 'o')
-                After = plt.scatter(xnewpoint[i],ynewpoint[i], c = 'white', s = 75, marker = 's')
-                
+                Before = plt.scatter(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'], c = 'white', s = 75, marker = 'o')
+                After = plt.scatter(node_resluts.ix[i, 'New CorrdiX'], node_resluts.ix[i, 'New CorrdiY'], c = 'white', s = 75, marker = 's')
+
             elif node_resluts.ix[i, 'support'] == 'fix':
+                Fix = plt.scatter(node_resluts.ix[i, 'New CorrdiX'], node_resluts.ix[i, 'New CorrdiY'], s = 100, marker = 'x', c = 'k', lw = 3)
                 # 支持反力ベクトルの表示
-                Fix = plt.scatter(xpoint[i],ypoint[i], s = 100, marker = 'x', c = 'k', lw = 3)
                 ReactionForce = plt.quiver(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'], 
                                             reaction_force[2 * j], reaction_force[2 * j + 1],angles='xy' ,scale_units='xy', color = 'gray', scale=1)
                 
@@ -295,14 +274,7 @@ def post():
         strio.buf = strio.getvalue()
         svgstr = strio.buf[strio.buf.find('<svg'):]
         
-        ''' 
-        svgjson = json.dumps(svgstr)
-        '''
-
-    #return render_template('index.html', svgstr = svgstr)
     return svgstr
-
-
 
 if __name__ == '__main__':
     app.run()
