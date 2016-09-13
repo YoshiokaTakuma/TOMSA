@@ -27,6 +27,13 @@ def post():
 
     # postからデータ読み込み
     all_data = request.json
+
+    if 'null' in all_data:
+        return 'データを入力してください'
+        sys.exit()
+    else:
+        pass
+
     index = all_data.find('][')
     node = pd.DataFrame(eval(all_data[0:index + 1]))
     node['Point_ID'] = np.array(range(len(node))) + 1
@@ -38,6 +45,8 @@ def post():
     spring.columns = ['Point1', 'Point2', 'constant', 'Spring_No']
     spring = spring.ix[:, ['Spring_No', 'Point1', 'Point2', 'constant']]
     # データ読み込みここまで
+
+
 
     try:
         # よく使う定数と配列の定義
@@ -79,6 +88,12 @@ def post():
             elif node.ix[i,3] == 'fix':
                 fix.append(str(node.ix[i,0]) + 'x')
                 fix.append(str(node.ix[i,0]) + 'y')
+        
+        if len(fix)/2 < 2:
+            return '二点以上固定してください'
+            sys.exit()
+        else:
+            pass
 
         point_order = free + fix    
         eq_id = list(range(1, len(point_order) +1))
@@ -245,7 +260,7 @@ def post():
                 # 力のベクトル
                 if node.ix[i, 'forceX'] != 0 or node.ix[i, 'forceY'] != 0:
                     ExternalForce = plt.quiver(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'], 
-                                            node.ix[i, 'forceX'], node.ix[i, 'forceY'],angles='xy',scale_units='xy',scale=1)
+                                            node.ix[i, 'forceX'], node.ix[i, 'forceY'],angles='xy',scale_units='xy',scale=1, units='width')
                     plt.text(node.ix[i, 'CorrdiX'], node.ix[i, 'CorrdiY'] * 1.02, 
                             '(' + str(node.ix[i, 'forceX']) + ',' + str(node.ix[i, 'forceY']) + ')')
                     
@@ -276,7 +291,7 @@ def post():
                     bbox_to_anchor=(1.4, 0.7), frameon = True)
             # 右側の余白を調整
             plt.subplots_adjust(right=0.7)
-
+            
             strio = io.StringIO()
             fig.savefig(strio, format='svg')
             plt.close(fig)

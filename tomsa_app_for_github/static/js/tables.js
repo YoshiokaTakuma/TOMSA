@@ -73,7 +73,17 @@ var table_spring = new Handsontable(grid_spring, {
   enterBeginsEditing: false
 });
 
-function calculation(){
+
+// 自動更新
+var count = 0;
+$(function() {
+	update();
+	//関数update()を2000ミリ秒間隔で呼び出す
+	setInterval("update()", 4000);
+
+});
+
+function update() {
   var node = JSON.stringify(table_node.getData());
   var spring = JSON.stringify(table_spring.getData());
   var data = JSON.stringify(node + spring);
@@ -83,11 +93,12 @@ function calculation(){
     data : data,
     contentType: 'application/JSON',
     scriptCharset: 'utf-8',
-    success: function(x){
-      $('show_result').append($('#show_result').html(x));
-      // $('#show_result').html(x);
-    }
-    })
+  })
+  .always(function(res) {
+    //これはクロスオリジン制限で弾かれるため、「success」「done」ではダメ。
+    //No 'Access-Control-Allow-Origin' header is present on the requested resource.
+    count++;
+    $('show_result').append($('#show_result').html(res));
+    $('#show_result').html(res);
+  });
 };
-
-
