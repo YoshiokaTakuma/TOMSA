@@ -15,22 +15,23 @@ from io import StringIO
 from flask import Flask, render_template, request
 import json
 
-from app import node
-from app import spring
+from app import node_data
+from app import spring_data
 '''
 node = pd.read_csv('node.csv')
 spring = pd.read_csv('spring.csv')
 '''
-node = node()
-spring = spring()
-# よく使う定数と配列の定義
-node_number = node.ix[:, 0]
-matrix_size = len(node_number)
-spring_number = spring.ix[:, 0]
-k = spring.ix[:, 'constant']
 
 def main():
-    # spring dataに角度情報を付加
+    # よく使う定数と配列の定義
+    global node, node_number, matrix_size, spring, spring_number, k
+    node = node_data()
+    node_number = node.ix[:, 0]
+    matrix_size = len(node_number)
+
+    spring = spring_data()
+    spring_number = spring.ix[:, 0]
+    k = spring.ix[:, 'constant']
     spring['degree'] = [cal_spring_degree(i) for i in spring_number - 1]
     
     # 節点IDと方程式IDを格納した辞書作成
@@ -162,6 +163,7 @@ def cal():
             part_force.append(node.ix[i, 'forceY'])
     part_force = np.array(part_force)
     
+
     if np.linalg.det(part_matrix) == 0:
         return 'マトリクスの逆行列＝０、構造物が不安定'
         sys.exit()
@@ -204,10 +206,6 @@ def results():
     
     return
 
-
-
-    
-
 def spring_force(sp):
     dx = node.ix[spring.ix[sp, 'Point2']-1, 'CorrdiX'] - node.ix[spring.ix[sp, 'Point1']-1, 'CorrdiX']
     dy = node.ix[spring.ix[sp, 'Point2']-1, 'CorrdiY'] - node.ix[spring.ix[sp, 'Point1']-1, 'CorrdiY']
@@ -225,15 +223,10 @@ def spring_force(sp):
     return spring_force
 
 def plot_springs(sp):
-    global unchanged, extended, shrunk
+
     # プロットに表示
     spf = spring_force(sp)
-    
-    if spf != 0:
-        text_plot_x = (node.ix[spring.ix[sp, 'Point2']-1, 'CorrdiX'] + node.ix[spring.ix[sp, 'Point1']-1, 'CorrdiX'])/2
-        text_plot_y = (node.ix[spring.ix[sp, 'Point2']-1, 'CorrdiY'] + node.ix[spring.ix[sp, 'Point1']-1, 'CorrdiY'])/2
-        plt.text(text_plot_x, text_plot_y, np.around(spf, decimals=3))
-        
+
     # 伸びてたら赤線、縮んでたら青線、変化なしは黒線
     plt.plot([node.ix[spring.ix[sp, 'Point1']-1, 'CorrdiX'], node.ix[spring.ix[sp, 'Point2']-1, 'CorrdiX']], 
              [node.ix[spring.ix[sp, 'Point1']-1, 'CorrdiY'], node.ix[spring.ix[sp, 'Point2']-1, 'CorrdiY']],':k')
@@ -243,28 +236,28 @@ def plot_springs(sp):
     y1 = node_results.ix[spring.ix[sp, 'Point1']-1, 'New CorrdiY']
     y2 = node_results.ix[spring.ix[sp, 'Point2']-1, 'New CorrdiY']
     
-    if spf == 0:
-        unchanged, = plt.plot([x1, x2], [y1, y2], 'k',  lw = 2)
-    elif spf > 0:
-        extended, = plt.plot([x1, x2], [y1, y2], 'r',  lw = 2)
-    elif spf < 0:
-        shrunk, = plt.plot([x1, x2], [y1, y2], 'b',  lw = 2)
-    unchanged, = plt.plot([0, 0], [0, 0], 'k',  lw = 2)
-    extended, = plt.plot([0, 0], [0, 0], 'r',  lw = 2)
-    shrunk, = plt.plot([0, 0], [0, 0], 'b',  lw = 2)
 
+    if spf == 0:
+        plt.plot([x1, x2], [y1, y2], color = [0.5, 0.0, 0.5],  lw = 2)
+    elif spf > 0:
+        plt.plot([x1, x2], [y1, y2], color = [0.5 + (spf/max_color) / 2, 0.0, 0.5 - (spf/max_color) / 2], lw = 2)
+    elif spf < 0:
+        plt.plot([x1, x2], [y1, y2], color = [0.5 - (-spf/max_color) / 2, 0.0, 0.5 + (-spf/max_color) / 2],  lw = 2)
+    
     return
 
 j = 0
 def plot_node(nd, cnt):
     global Fix, Before, After, ExternalForce, ReactionForce
+
     # 力のベクトル
     if node.ix[nd, 'forceX'] != 0 or node.ix[nd, 'forceY'] != 0:
         ExternalForce = plt.quiver(node.ix[nd, 'CorrdiX'], node.ix[nd, 'CorrdiY'], 
                                    node.ix[nd, 'forceX'], node.ix[nd, 'forceY'],angles='xy',scale_units='xy',scale=1)
         plt.text(node.ix[nd, 'CorrdiX'], node.ix[nd, 'CorrdiY'] * 1.02, 
                  '(' + str(node.ix[nd, 'forceX']) + ',' + str(node.ix[nd, 'forceY']) + ')')
-        
+        plt.plot(node.ix[nd, 'CorrdiX'] + node.ix[nd, 'forceX'], node.ix[nd, 'CorrdiY'] + node.ix[nd, 'forceY'], marker = '')
+
     # 変形前、変形後のプロット
     # 固定されている場合は☓をプロットする
     if node_results.ix[nd, 'support'] == 'free':
@@ -275,32 +268,51 @@ def plot_node(nd, cnt):
         Fix = plt.scatter(node_results.ix[nd, 'New CorrdiX'], node_results.ix[nd, 'New CorrdiY'], s = 100, marker = 'x', c = 'k', lw = 3)
         ReactionForce = plt.quiver(node.ix[nd, 'CorrdiX'], node.ix[nd, 'CorrdiY'], 
                                     reaction_force[2 * cnt], reaction_force[2 * cnt + 1],angles='xy' ,scale_units='xy', color = 'gray', scale=1)
-        
-        if node.ix[nd, 'CorrdiY'] == 0:
-            plt.text(node.ix[nd, 'CorrdiX'] + 0.25, node.ix[nd, 'CorrdiY'] - 0.75, 
-                     '(' + str(np.around(reaction_force[2 * cnt], decimals=3)) + ',' + str(np.around(reaction_force[2 * cnt + 1], decimals=3)) + ')')
+        plt.plot(node.ix[nd, 'CorrdiX'] + reaction_force[2 * cnt], node.ix[nd, 'CorrdiY'] + reaction_force[2 * cnt + 1], marker = '')
+
+
+        if node.ix[nd, 'CorrdiY'] == min(node.ix[:, 'CorrdiY']):
+            plt.text(node.ix[nd, 'CorrdiX'] - max(node.ix[:, 'CorrdiY'])*0.1, node.ix[nd, 'CorrdiY'] - max(node.ix[:, 'CorrdiY'])*0.1, 
+                     '(' + str(np.around(reaction_force[2 * cnt], decimals=3)) + ',' + str(np.around(reaction_force[2 * cnt + 1], decimals=3)) + ')', va = 'top', ha = 'center')
+            
         else:
             plt.text(node.ix[nd, 'CorrdiX'], node.ix[nd, 'CorrdiY'] * 1.02, 
                      '(' + str(np.around(reaction_force[2 * cnt], decimals=3)) + ',' + str(np.around(reaction_force[2 * cnt + 1], decimals=3)) + ')')
+        
+    return
+
+def color_list():
+    color_list = [spring_force(i) for i in spring_number - 1]
+    
+    global max_color
+    max_color = max(np.absolute(color_list))
+
     return
             
 def plot():
     fig = plt.figure()
     sns.set_style('whitegrid')
     plt.clf()
-    
+    color_list()
     for i in spring_number - 1:
         plot_springs(i)
     
     j = 0
     for i in node_number - 1:
         plot_node(i, j)
-        j = j + 1
+        if node_results.ix[i, 'support'] == 'fix':
+            j = j + 1
     
+    title, = plt.plot([0, 0], [0, 0], 'w')
+    redmax, = plt.plot([0, 0], [0, 0], 'r')
+    purplezero, = plt.plot([0, 0], [0, 0], color = [0.5, 0.0, 0.5])
+    bluemax, = plt.plot([0, 0], [0, 0], 'b')
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.legend([Fix, Before, After, ExternalForce, ReactionForce, unchanged, extended, shrunk], 
-               ['Fix', 'Before', 'After', 'External Force', 'Reaction Force', 'unchanged', 'extended', 'shrunk'], 
+    plt.axis('equal')
+    plt.legend([Fix, Before, After, ExternalForce, ReactionForce, title, redmax, purplezero, bluemax], 
+               ['Fix', 'Before', 'After', 'External Force', 'Reaction Force', 'Spring Force',
+               np.around(max_color, decimals=2), '0.0', np.around(max_color, decimals=2) * (-1)], 
                bbox_to_anchor=(1.4, 0.7), frameon = True)
     # 右側の余白を調整
     plt.subplots_adjust(right=0.7)
